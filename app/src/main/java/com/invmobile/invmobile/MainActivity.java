@@ -9,8 +9,10 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.support.v4.view.GravityCompat;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -47,6 +49,9 @@ public class MainActivity extends AppCompatActivity
     String ruta;
     Context contexto;
     CardView card_inventario,card_almacenes;
+    AlertDialog.Builder dialog;
+    View vista;
+    LayoutInflater inflater;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -153,8 +158,17 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void btnInventario(View view) {
+        inflater = MainActivity.this.getLayoutInflater();
+        vista = inflater.inflate(R.layout.dialog_almacenes, null);
+        dialog=new AlertDialog.Builder(contexto);
+        dialog.setTitle("Almacenes");
+
+
+        /*
         Intent i=new Intent(contexto,Inventario.class);
         startActivity(i);
+
+         */
     }
 
     public void btnalmacenes(View view) {
