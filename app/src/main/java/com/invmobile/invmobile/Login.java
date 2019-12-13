@@ -178,6 +178,7 @@ public class Login extends AppCompatActivity {
                                 r.put("id_empresa", objeto.getString("id_empresa"));
                                 r.put("empresa", objeto.getString("empresa"));
                                 r.put("dominio",objeto.getString("dominio"));
+                                r.put("almacen","");
                                 //r.put("dominio", "3011");
                                 db.insert("login", null, r);
                                 db.close();

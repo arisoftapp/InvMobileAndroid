@@ -5,5 +5,118 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Inventario">
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:orientation="horizontal"
+            android:background="@color/gris"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_margin="@dimen/inv_margin"
+                android:textColor="@color/blanco"
+                android:text="Almacen:"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+            <TextView
+                android:id="@+id/tv_alm"
+                android:text="alm"
+                android:layout_marginBottom="@dimen/inv_margin"
+                android:layout_marginTop="@dimen/inv_margin"
+                android:layout_marginRight="@dimen/inv_margin"
+                android:textColor="@color/blanco"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+
+        </LinearLayout>
+        <EditText
+            android:onClick="pruebas"
+            android:id="@+id/et_conteo"
+            android:hint="Codigo"
+            android:imeOptions="actionDone"
+            android:singleLine="true"
+            android:inputType="textCapCharacters"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+        <LinearLayout
+
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <CheckBox
+                android:id="@+id/cb_cant"
+                android:text="Cant"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+            <EditText
+                android:layout_weight="0.1"
+                android:layout_width="0dp"
+                android:inputType="numberDecimal"
+                android:text="1"
+                android:enabled="false"
+                android:layout_height="wrap_content"/>
+            <CheckBox
+                android:id="@+id/cb_buscar"
+                android:layout_width="wrap_content"
+                android:text="Buscar"
+                android:layout_height="wrap_content"/>
+            <EditText
+                android:layout_weight="0.2"
+                android:layout_width="0dp"
+                android:hint="Codigo"
+                android:enabled="false"
+                android:layout_height="wrap_content"/>
+
+
+        </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@drawable/border_top_n_bottom"
+        android:paddingStart="8dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="8dp"
+        android:paddingBottom="8dp">
+        <TextView
+            android:id="@+id/textView5"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.4"
+            android:text="Articulo" />
+
+        <TextView
+            android:id="@+id/textView14"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.2"
+            android:gravity="center"
+            android:text="Existencia" />
+
+        <TextView
+            android:id="@+id/textView15"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.2"
+            android:gravity="center"
+            android:text="Conteo" />
+        <TextView
+            android:id="@+id/textView16"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.2"
+            android:gravity="center"
+            android:text="Diferencia" />
+
+    </LinearLayout>
+        <ListView
+            android:id="@+id/lista_conteo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/white" />
+    </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>

@@ -2,6 +2,7 @@ package com.invmobile.invmobile;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
@@ -23,6 +24,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
+import android.widget.Spinner;
 
 import com.invmobile.invmobile.tools.Complementos;
 import com.invmobile.invmobile.tools.ConsultaAlmacenes;
@@ -38,6 +40,7 @@ import java.io.DataOutputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Vector;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -49,9 +52,11 @@ public class MainActivity extends AppCompatActivity
     String ruta;
     Context contexto;
     CardView card_inventario,card_almacenes;
-    AlertDialog.Builder dialog;
+    AlertDialog dialog;
     View vista;
     LayoutInflater inflater;
+    Spinner spn_almacenes;
+    Vector<String> codigos;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -160,15 +165,39 @@ public class MainActivity extends AppCompatActivity
     public void btnInventario(View view) {
         inflater = MainActivity.this.getLayoutInflater();
         vista = inflater.inflate(R.layout.dialog_almacenes, null);
-        dialog=new AlertDialog.Builder(contexto);
-        dialog.setTitle("Almacenes");
+        spn_almacenes=vista.findViewById(R.id.spn_almacenes);
+        spn_almacenes.setAdapter(consultaAlmacenes.getAlmacenes(contexto));
+        codigos=consultaAlmacenes.getCodigos(contexto);
+        dialog=new AlertDialog.Builder(contexto)
+        .setTitle("Almacenes")
+                .setView(vista)
+                .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        int size = spn_almacenes.getAdapter().getCount();
+                        if (size>0){
+                            int pos = spn_almacenes.getSelectedItemPosition();
+                            try {
+                                Database admin = new Database(getApplicationContext(), null, 1);
+                                SQLiteDatabase db = admin.getWritableDatabase();
+                                ContentValues r = new ContentValues();
+                                r.put("almacen",codigos.get(pos).toString());
+                                db.update("login",r, "usuario='"+consultasUsuario.getUsuario(contexto)+"'",null);
+                                db.close();
+                            } catch (SQLiteException e) {
+                                complementos.mensajes("error al actualizar en base de datos:" + e.getMessage(),contexto);
+                            }
+                            Intent intent=new Intent(contexto,Inventario.class);
+                            startActivity(intent);
+                            //complementos.mensajes(""+consultasUsuario.getAlmacenSeleccionado(contexto),contexto);
+                        }
 
+                    }
+                })
+                .setNegativeButton("Cancelar",null)
+                .create();
+        dialog.show();
 
-        /*
-        Intent i=new Intent(contexto,Inventario.class);
-        startActivity(i);
-
-         */
     }
 
     public void btnalmacenes(View view) {
