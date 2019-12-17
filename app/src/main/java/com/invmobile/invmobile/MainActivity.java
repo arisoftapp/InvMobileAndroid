@@ -28,6 +28,7 @@ import android.widget.Spinner;
 
 import com.invmobile.invmobile.tools.Complementos;
 import com.invmobile.invmobile.tools.ConsultaAlmacenes;
+import com.invmobile.invmobile.tools.ConsultasConteo;
 import com.invmobile.invmobile.tools.ConsultasUsuario;
 import com.invmobile.invmobile.tools.Database;
 
@@ -47,6 +48,7 @@ public class MainActivity extends AppCompatActivity
     Complementos complementos;
     ConsultasUsuario consultasUsuario;
     ConsultaAlmacenes consultaAlmacenes;
+    ConsultasConteo consultasConteo;
     int timeout;
     String mensaje;
     String ruta;
@@ -86,6 +88,7 @@ public class MainActivity extends AppCompatActivity
         consultaAlmacenes=new ConsultaAlmacenes();
         complementos=new Complementos();
         consultasUsuario=new ConsultasUsuario();
+        consultasConteo=new ConsultasConteo();
         ruta=complementos.getUrl()+consultasUsuario.getDominio(getApplicationContext())+"/";
         timeout=complementos.getTimeout();
         contexto=this;
@@ -187,8 +190,11 @@ public class MainActivity extends AppCompatActivity
                             } catch (SQLiteException e) {
                                 complementos.mensajes("error al actualizar en base de datos:" + e.getMessage(),contexto);
                             }
+                            verificarConteo();
+                            /*
                             Intent intent=new Intent(contexto,Inventario.class);
                             startActivity(intent);
+                            */
                             //complementos.mensajes(""+consultasUsuario.getAlmacenSeleccionado(contexto),contexto);
                         }
 
@@ -198,6 +204,40 @@ public class MainActivity extends AppCompatActivity
                 .create();
         dialog.show();
 
+    }
+    public void verificarConteo()
+    {
+        String idalmacen=consultasUsuario.getAlmacenSeleccionado(contexto);
+        if(consultasConteo.validarConteo(idalmacen,contexto)==true)
+        {
+            complementos.mensajes("tiene conteo",contexto);
+            dialog=new AlertDialog.Builder(contexto)
+                    .setTitle("Conteo encontrado")
+                    .setMessage("\nSe ha detectado que ya cuenta con un conteo iniciado en el almacen seleccionado.\n \n¿Desea continuar con el conteo?\n")
+                    .setCancelable(false)
+                    .setPositiveButton("Continuar", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            Intent intent=new Intent(contexto,Inventario.class);
+                            startActivity(intent);
+                        }
+                    })
+                    .setNegativeButton("Nuevo Conteo", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            complementos.eliminarTabla("conteo",contexto);
+                            Intent intent=new Intent(contexto,Inventario.class);
+                            startActivity(intent);
+                        }
+                    })
+                    .create();
+            dialog.show();
+        }
+        else
+        {
+            Intent intent=new Intent(contexto,Inventario.class);
+            startActivity(intent);
+        }
     }
 
     public void btnalmacenes(View view) {

@@ -9,6 +9,7 @@
     <string name="tabla_almacenes">almacenes</string>
     <string name="tabla_login">login</string>
     <string name="select_almacen">Seleccionar Almacen:</string>
+    <string name="titulo_activicy_serie">InvSeries</string>
 
 
     <string name="menu_home">Home</string>

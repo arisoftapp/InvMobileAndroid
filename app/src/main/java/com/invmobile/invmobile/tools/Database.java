@@ -13,6 +13,7 @@ public class Database extends SQLiteOpenHelper {
     public static final String TABLA_USU="login";
     public static final String TABLA_ALM="almacenes";
     public static final String TABLA_CTO="conteo";
+    public static final String TABLA_SERIES="series";
     public static final String SQL_USUARIO="CREATE TABLE "+TABLA_USU+"(usuario text ," +
             "id_empresa text," +
             "empresa text," +
@@ -32,22 +33,27 @@ public class Database extends SQLiteOpenHelper {
             "estatus text," +
             "comentarios text"+
             ")";
+    public static final String SQL_SERIES="CREATE TABLE "+TABLA_SERIES+"(_id INTEGER PRIMARY KEY, serie text," +
+            "codigo text," +
+            "almacen text," +
+            "estatus text)";
 
     private static final String SQL_INICIOUSU = "DROP TABLE IF EXISTS "+TABLA_USU;
     private static final String SQL_INICIOALM = "DROP TABLE IF EXISTS "+TABLA_ALM;
     private static final String SQL_INICIOCTO = "DROP TABLE IF EXISTS "+TABLA_CTO;
+    private static final String SQL_INICIOSERIES = "DROP TABLE IF EXISTS "+TABLA_SERIES;
 
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(SQL_INICIOUSU);
         db.execSQL(SQL_INICIOALM);
         db.execSQL(SQL_INICIOCTO);
-
+        db.execSQL(SQL_INICIOSERIES);
 
         db.execSQL(SQL_USUARIO);
         db.execSQL(SQL_ALMACENES);
         db.execSQL(SQL_CONTEO);
-
+        db.execSQL(SQL_SERIES);
 
     }
 

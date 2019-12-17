@@ -2,6 +2,7 @@ package com.invmobile.invmobile;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
@@ -107,14 +108,13 @@ public class Inventario extends AppCompatActivity {
         try{
             Database admin = new Database(contexto,null,1);
             SQLiteDatabase db = admin.getWritableDatabase();
-            Cursor fila = db.rawQuery("SELECT codigo,descripcion,existencia,conteo,diferencia,serie FROM conteo",null);
+            Cursor fila = db.rawQuery("SELECT codigo,descripcion,existencia,conteo,diferencia,serie FROM conteo where idalmacen='"+idalmacen+"' ",null);
             if(fila.moveToFirst())
             {
                 do {
                     String codigo = fila.getString(0);
                     String descripcion = fila.getString(1);
                     Float existencia = fila.getFloat(2);
-
                     lista.add(0, new InventarioModel(fila.getString(0), fila.getString(1), fila.getString(2), fila.getString(3), fila.getString(4), fila.getString(5)));
                     Log.i("consultausuario", " | " + fila.getString(0));
                 }while (fila.moveToNext());
@@ -138,6 +138,7 @@ public class Inventario extends AppCompatActivity {
     {
         String validar;
         String serie;
+        String codigo;
         @Override
         protected void onPreExecute()
         {
@@ -148,7 +149,8 @@ public class Inventario extends AppCompatActivity {
         protected String doInBackground(String... params)
         {
             try {
-                String codigo=params[0];
+                codigo=params[0];
+                String codigo2,descripcion;
                 Float conteo=Float.parseFloat(params[2]),existencia,diferencia;
 
                 boolean insertar;
@@ -187,57 +189,32 @@ public class Inventario extends AppCompatActivity {
                         {
                             //publishProgress(i+1);
                             JSONObject objeto = jArray.getJSONObject(i);
-
+                            serie=objeto.getString("serie");
                             if(insertar==true)
                             {
+
                                 existencia=Float.parseFloat(objeto.getString("existenciaActual"));
                                 diferencia=existencia-conteo;
-                                serie=objeto.getString("serie");
-
-                                try{
-                                    Database admin=new Database(contexto,null,1);
-                                    SQLiteDatabase db = admin.getWritableDatabase();
-                                    ContentValues r = new ContentValues();
-                                    r.put("codigo",objeto.getString("codigo"));
-                                    r.put("codigo2",objeto.getString("codigo2"));
-                                    r.put("descripcion",objeto.getString("descripcion"));
-                                    r.put("conteo",conteo);
-                                    r.put("existencia",existencia);
-                                    r.put("idalmacen",idalmacen);
-                                    r.put("serie",objeto.getString("serie"));
-                                    r.put("diferencia",diferencia);
-                                    r.put("estatus","");
-                                    r.put("comentarios","");
-                                    db.insert("conteo",null,r);
-                                    db.close();
-
-                                }catch (SQLiteException e)
+                                codigo2=objeto.getString("codigo2");
+                                descripcion=objeto.getString("descripcion");
+                                if(serie.equalsIgnoreCase("S"))
                                 {
-                                    mensaje="error al insertar articulo:"+e.getMessage();
-                                    validar="FALSE";
+                                    conteo=Float.valueOf(0);
+                                    existencia=Float.valueOf(0);
+                                    diferencia=Float.valueOf(0);
+                                    consultasConteo.insertarConteo(codigo,codigo2,descripcion,conteo,existencia,idalmacen,serie,diferencia,contexto);
                                 }
+                                else
+                                {
+
+                                    consultasConteo.insertarConteo(codigo,codigo2,descripcion,conteo,existencia,idalmacen,serie,diferencia,contexto);
+                                }
+
                             }
                             else
                             {
 
                             }
-                            /*
-                            try{
-                                Database admin=new Database(contexto,null,1);
-                                SQLiteDatabase db = admin.getWritableDatabase();
-                                ContentValues r = new ContentValues();
-                                r.put("id_almacen",objeto.getString("idalmacen"));
-                                r.put("almacen",objeto.getString("almacen"));
-                                db.insert("almacenes",null,r);
-                                db.close();
-
-                            }catch (SQLiteException e)
-                            {
-                                mensaje="error al insertar almacenes:"+e.getMessage();
-                                validar="FALSE";
-                            }
-
-                             */
 
                         }
                         Log.i("peticion"," | "+jObject.toString());
@@ -277,13 +254,17 @@ public class Inventario extends AppCompatActivity {
 
             complementos.cerrar_barra_progreso();
             complementos.mensajes(mensaje,contexto);
+            et_conteo.setText("");
             actualizarLista();
             if(s.equalsIgnoreCase("TRUE"))
             {
 
                 if(serie.equalsIgnoreCase("S"))
                 {
-                    et_conteo.setText("");
+                    complementos.mensajes("Articulo con series",contexto);
+                    Intent i = new Intent(getApplicationContext(),SeriesActivity.class);
+                    i.putExtra("codigo",codigo);
+                    startActivity(i);
                 }
                 else
                 {
@@ -298,6 +279,7 @@ public class Inventario extends AppCompatActivity {
             super.onPostExecute(s);
         }
     }
+
 
 
 }
