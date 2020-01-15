@@ -84,6 +84,27 @@ public class ConsultasConteo {
         }
         return validar;
     }
+    public Boolean actualizarConteo(String codigo,Float conteo,Float existencia,String idalmacen,Float diferencia, Context contexto)
+    {
+        boolean validar;
+        try{
+            Database admin=new Database(contexto,null,1);
+            SQLiteDatabase db = admin.getWritableDatabase();
+            ContentValues r = new ContentValues();
+            r.put("conteo",conteo);
+            r.put("existencia",existencia);
+            r.put("diferencia",diferencia);
+            db.update("conteo",r,"codigo='"+codigo+"' and idalmacen='"+idalmacen+"'  ",null);
+            db.close();
+            validar=true;
+
+        }catch (SQLiteException e)
+        {
+            //mensaje="error al insertar articulo:"+e.getMessage();
+            validar=false;
+        }
+        return validar;
+    }
     public String getDescripcion(String codigo,String idalmacen, Context contexto)
     {
         String resultado="";

@@ -49,9 +49,12 @@
             <CheckBox
                 android:id="@+id/cb_cant"
                 android:text="Cant"
+                android:onClick="onCheckboxClicked"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
             <EditText
+
+                android:id="@+id/et_cant"
                 android:layout_weight="0.1"
                 android:layout_width="0dp"
                 android:inputType="numberDecimal"
