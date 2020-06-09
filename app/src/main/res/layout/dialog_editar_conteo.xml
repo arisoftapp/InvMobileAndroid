@@ -36,7 +36,7 @@
             android:textSize="18sp" />
 
         <TextView
-            android:id="@+id/tv_descr"
+            android:id="@+id/tv_desc_edit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="24dp"
@@ -44,10 +44,61 @@
             android:layout_weight="1"
             android:text="Descripcion"
             android:textSize="18sp" />
-        <LinearLayout
-            android:orientation="horizontal"
+        <TextView
+            android:id="@+id/textView14"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="24dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="24dp"
+            android:layout_weight="1"
+            android:text="Existencia:"
+            android:textColor="#1c1c1c"
+            android:textSize="18sp"
+            app:textAllCaps="false" />
+        <TextView
+            android:id="@+id/tv_exi_edit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="24dp"
+            android:layout_marginRight="24dp"
+            android:layout_weight="1"
+            android:text="Existencia"
+            android:layout_marginBottom="20dp"
+            android:textSize="18sp" />
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                >
+
+                <Button
+
+                    android:layout_marginTop="10dp"
+                    android:id="@+id/btn_act"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:layout_marginBottom="16dp"
+                    android:text="Actualizar"
+                    android:background="@drawable/boton_redondeado"
+                    android:layout_gravity="center"
+                    android:drawableLeft="@drawable/ic_almacen_wt"
+                    android:drawablePadding="8dp"
+                    android:paddingRight="16dp"
+                    android:paddingLeft="8dp"
+                    android:textColor="@color/blanco"
+                    android:backgroundTint="@color/colorPrimaryDark"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+            </RelativeLayout>
+
+
 
         </LinearLayout>
 
@@ -76,14 +127,14 @@
             android:layout_marginTop="15dp">
 
             <ImageView
-                android:id="@+id/imageView5"
+                android:id="@+id/btn_menos"
                 android:layout_width="20dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 app:srcCompat="@drawable/ic_remove_circle_black_24dp" />
 
             <EditText
-                android:id="@+id/editTextConteo"
+                android:id="@+id/et_conteo_edit"
                 android:layout_width="156dp"
                 android:layout_height="match_parent"
                 android:layout_marginLeft="24dp"
@@ -92,7 +143,7 @@
                 android:gravity="center"/>
 
             <ImageView
-                android:id="@+id/imageView4"
+                android:id="@+id/btn_mas"
                 android:layout_width="20dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"

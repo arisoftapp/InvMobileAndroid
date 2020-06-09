@@ -1,15 +1,16 @@
 package com.invmobile.invmobile.Modelo;
 
-public class InventarioModel {
+public class InventarioModelClf {
     private String CodigoArticulo;
     private String Descripcion;
     private Float Existencia;
     private Float Conteo;
     private Float Diferencia;
     private String Comentarios;
+    private String Clasificacion;
 
 
-    public InventarioModel(String codigo, String descripcion, String existencia, String conteo, String diferencia, String serie, String comentarios)
+    public InventarioModelClf(String codigo, String descripcion, String existencia, String conteo, String diferencia, String serie, String comentarios,String clf)
     {
         this.CodigoArticulo=codigo;
         this.Descripcion=descripcion;
@@ -18,6 +19,15 @@ public class InventarioModel {
         this.Diferencia=Float.parseFloat(diferencia);
         this.Serie=serie;
         this.Comentarios=comentarios;
+        this.Clasificacion=clf;
+    }
+
+    public String getClasificacion() {
+        return Clasificacion;
+    }
+
+    public void setClasificacion(String clasificacion) {
+        Clasificacion = clasificacion;
     }
 
     public String getCodigoArticulo() {

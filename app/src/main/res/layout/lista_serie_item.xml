@@ -4,12 +4,16 @@
     android:layout_height="match_parent"
     >
     <LinearLayout
+        android:id="@+id/ll_renglon"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:orientation="horizontal">
         <TextView
+            android:layout_gravity="center"
             android:id="@+id/tv_serie"
             android:text="SERIE"
+            android:paddingLeft="10dp"
+
             android:layout_width="0dp"
             android:layout_weight="0.8"
             android:layout_height="wrap_content"/>
@@ -17,6 +21,7 @@
             android:id="@+id/tv_estatus"
             android:text="E"
             android:textAlignment="center"
+            android:layout_gravity="center"
             android:layout_width="0dp"
             android:layout_weight="0.2"
             android:layout_height="wrap_content"/>

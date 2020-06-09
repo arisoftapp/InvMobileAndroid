@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <TextView
+            android:text="Seleccione filtro:"
+            android:textAlignment="center"
+            android:layout_margin="@dimen/dialog_select_almacen_margin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        </TextView>
+
+        <Spinner
+            android:layout_marginLeft="@dimen/dialog_select_almacen_margin"
+            android:layout_marginRight="@dimen/dialog_select_almacen_margin"
+            android:id="@+id/sp_filtro_serie"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        </Spinner>
+    </LinearLayout>
+
+</android.support.constraint.ConstraintLayout>

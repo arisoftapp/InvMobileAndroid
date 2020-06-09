@@ -2,14 +2,12 @@ package com.invmobile.invmobile;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.database.Cursor;
-import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -21,16 +19,17 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.invmobile.invmobile.Modelo.InventarioModel;
 import com.invmobile.invmobile.Modelo.SeriesModel;
+import com.invmobile.invmobile.Modelo.SeriesModelClf;
 import com.invmobile.invmobile.tools.Complementos;
 import com.invmobile.invmobile.tools.ConsultaSeries;
+import com.invmobile.invmobile.tools.ConsultaSeriesCLF;
 import com.invmobile.invmobile.tools.ConsultasConteo;
+import com.invmobile.invmobile.tools.ConsultasConteoClf;
 import com.invmobile.invmobile.tools.ConsultasUsuario;
 import com.invmobile.invmobile.tools.Database;
 
@@ -42,16 +41,14 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Vector;
-import java.util.zip.Inflater;
 
-public class SeriesActivity extends AppCompatActivity {
+public class SeriesActivityClf extends AppCompatActivity {
     Complementos complementos;
     ConsultasUsuario consultasUsuario;
-    ConsultasConteo consultasConteo;
-    ConsultaSeries consultaSeries;
+    ConsultasConteoClf consultasConteoClf;
+    ConsultaSeriesCLF consultaSeriesClf;
     Context contexto;
-    String codigo,idalmacen,ruta,mensaje;
+    String codigo,idalmacen,ruta,mensaje,id_clf;
     TextView tv_codigo,tv_existencia,tv_conteo,tv_diferencia,tv_descripcion,tv_edit_serie,tv_edit_estatus;
     EditText et_serie;
     ListView lv_series;
@@ -67,15 +64,16 @@ public class SeriesActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_series);
+        setContentView(R.layout.activity_series_clf);
         complementos=new Complementos();
         consultasUsuario=new ConsultasUsuario();
-        consultasConteo=new ConsultasConteo();
-        consultaSeries=new ConsultaSeries();
+        consultasConteoClf=new ConsultasConteoClf();
+        consultaSeriesClf=new ConsultaSeriesCLF();
         contexto=this;
         Bundle bundle = this.getIntent().getExtras();
         codigo = bundle.getString("codigo");
         idalmacen=consultasUsuario.getAlmacenSeleccionado(contexto);
+        id_clf=consultasUsuario.getClfSeleccionado(contexto);
         tv_codigo=(TextView)findViewById(R.id.tv_codigo);
         tv_existencia=(TextView)findViewById(R.id.tv_existencia);
         tv_conteo=(TextView)findViewById(R.id.tv_conteo);
@@ -85,12 +83,12 @@ public class SeriesActivity extends AppCompatActivity {
         lv_series=(ListView)findViewById(R.id.lv_series);
 
         tv_codigo.setText(codigo);
-        actualizarHeader();
-        tv_descripcion.setText(consultasConteo.getDescripcion(codigo,idalmacen,contexto));
+
+        tv_descripcion.setText(consultasConteoClf.getDescripcion(codigo,idalmacen,id_clf,contexto));
         ruta=complementos.getUrl()+consultasUsuario.getDominio(contexto)+"/";
         timeout=complementos.getTimeout();
 
-        if(consultaSeries.getTablaVacia(contexto)==true)
+        if(consultaSeriesClf.getVerificarSeries(codigo,contexto)==true)
         {
             //tabla de series vacia
             new consultaSeries().execute();
@@ -99,7 +97,7 @@ public class SeriesActivity extends AppCompatActivity {
         {
 
         }
-
+        actualizarHeader();
         actualizarLista();
         et_serie.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -110,18 +108,17 @@ public class SeriesActivity extends AppCompatActivity {
                 }
                 else
                 {
-
-                    if(consultaSeries.buscarSerie(codigo,idalmacen,et_serie.getText().toString().trim(),contexto)==true)
+                    if(consultaSeriesClf.buscarSerie(codigo,idalmacen,et_serie.getText().toString().trim(),contexto)==true)
                     {
-                        if(consultaSeries.getEstatus(codigo,idalmacen,et_serie.getText().toString().trim(),contexto).equalsIgnoreCase("N"))
+                        if(consultaSeriesClf.getEstatus(codigo,idalmacen,et_serie.getText().toString().trim(),contexto).equalsIgnoreCase("N"))
                         {
                             complementos.mensajes("si encontro",contexto);
-                            consultaSeries.cambiarEstatus(codigo,idalmacen,"D",et_serie.getText().toString().trim(),contexto);
+                            consultaSeriesClf.cambiarEstatus(codigo,idalmacen,"D",et_serie.getText().toString().trim(),contexto);
                             float cont,exis,dif;
                             cont=Float.parseFloat(tv_conteo.getText().toString())+1;
                             exis=Float.parseFloat(tv_existencia.getText().toString());
                             dif=exis-cont;
-                            consultasConteo.actualizarConteo(codigo,cont,exis,idalmacen,dif,contexto);
+                            consultasConteoClf.actualizarConteo(codigo,cont,idalmacen,dif,id_clf,contexto);
                         }
                         else
                         {
@@ -133,12 +130,12 @@ public class SeriesActivity extends AppCompatActivity {
                     else
                     {
                         complementos.mensajes("no encontro",contexto);
-                        consultaSeries.insertarSerie(et_serie.getText().toString().trim(),codigo,idalmacen,"ND",contexto);
+                        consultaSeriesClf.insertarSerie(et_serie.getText().toString().trim(),codigo,idalmacen,"ND",id_clf,contexto);
                         float cont,exis,dif;
                         cont=Float.parseFloat(tv_conteo.getText().toString())+1;
                         exis=Float.parseFloat(tv_existencia.getText().toString());
                         dif=exis-cont;
-                        consultasConteo.actualizarConteo(codigo,cont,exis,idalmacen,dif,contexto);
+                        consultasConteoClf.actualizarConteo(codigo,cont,idalmacen,dif,id_clf,contexto);
                     }
                     et_serie.setText("");
                     actualizarHeader();
@@ -161,7 +158,7 @@ public class SeriesActivity extends AppCompatActivity {
                 else
                 {
                     complementos.mensajes("click "+  lista.get(i).getEstatus(),contexto);
-                    inflater = SeriesActivity.this.getLayoutInflater();
+                    inflater = SeriesActivityClf.this.getLayoutInflater();
                     vista = inflater.inflate(R.layout.dialog_editar_series, null);
                     tv_edit_serie=vista.findViewById(R.id.tv_serie);
                     tv_edit_estatus=vista.findViewById(R.id.tv_estatus);
@@ -213,20 +210,20 @@ public class SeriesActivity extends AppCompatActivity {
 
                                     if(tv_edit_estatus.getText().toString().equalsIgnoreCase("ND"))
                                     {
-                                        consultaSeries.eliminarSerie(tv_edit_serie.getText().toString(),idalmacen,contexto);
+                                        consultaSeriesClf.eliminarSerie(tv_edit_serie.getText().toString(),idalmacen,contexto);
                                     }
                                     if(tv_edit_estatus.getText().toString().equalsIgnoreCase("N"))
                                     {
-                                        consultaSeries.cambiarEstatus(codigo,idalmacen,"N",tv_edit_serie.getText().toString(),contexto);
+                                        consultaSeriesClf.cambiarEstatus(codigo,idalmacen,"N",tv_edit_serie.getText().toString(),contexto);
                                     }
                                     if(tv_edit_estatus.getText().toString().equalsIgnoreCase("D"))
                                     {
-                                        consultaSeries.cambiarEstatus(codigo,idalmacen,"D",tv_edit_serie.getText().toString(),contexto);
+                                        consultaSeriesClf.cambiarEstatus(codigo,idalmacen,"D",tv_edit_serie.getText().toString(),contexto);
                                     }
-                                    float contadas=consultaSeries.getSeriesContadas(codigo,idalmacen,contexto);
-                                    float exis=Float.parseFloat(consultasConteo.getExistencia(codigo,idalmacen,contexto)) ;
+                                    float contadas=consultaSeriesClf.getSeriesContadas(codigo,idalmacen,contexto);
+                                    float exis=Float.parseFloat(consultasConteoClf.getExistencia(codigo,idalmacen,id_clf, contexto)) ;
                                     float dif=exis-contadas;
-                                    consultasConteo.actualizarConteo(codigo,contadas,exis,idalmacen,dif,contexto);
+                                    consultasConteoClf.actualizarConteo(codigo,contadas,idalmacen,dif,id_clf,contexto);
                                     actualizarLista();
                                     actualizarHeader();
                                     //complementos.mensajes("guardar "+codigo+" "+cont+" "+existencia+" "+idalmacen+" "+diferencia,contexto);
@@ -253,7 +250,7 @@ public class SeriesActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_series, menu);
+        inflater.inflate(R.menu.menu_series_clf, menu);
         return true;
     }
     @Override
@@ -264,30 +261,9 @@ public class SeriesActivity extends AppCompatActivity {
                 complementos.mensajes("actualizar",contexto);
                 new reconsultarSeries().execute();
                 return true;
-            case R.id.eliminar:
-                AlertDialog.Builder builder = new AlertDialog.Builder(contexto);
-                builder.setMessage("Desea eliminar series?")
-                        .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                // FIRE ZE MISSILES!
-                                complementos.mensajes("eliminar",contexto);
-                                consultaSeries.eliminarSeries(codigo,idalmacen,contexto);
-                                consultasConteo.eliminarCodigoConteo(codigo,idalmacen,contexto);
-                                finish();
-                            }
-                        })
-                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                // User cancelled the dialog
-                            }
-                        });
-
-                builder.show();
-
-                return true;
             case R.id.filtro:
                 final int[] idfiltro = {0};
-                inflater = SeriesActivity.this.getLayoutInflater();
+                inflater = SeriesActivityClf.this.getLayoutInflater();
                 vista = inflater.inflate(R.layout.dialog_filtro_series, null);
                 sp_filtro_serie=vista.findViewById(R.id.sp_filtro_serie);
                 sp_filtro_serie.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -353,18 +329,11 @@ public class SeriesActivity extends AppCompatActivity {
     }
     public void actualizarHeader()
     {
-        tv_existencia.setText(consultasConteo.getExistencia(codigo,idalmacen,contexto));
-        tv_conteo.setText(consultasConteo.getConteo(codigo,idalmacen,contexto));
-        tv_diferencia.setText(consultasConteo.getDiferencia(codigo,idalmacen,contexto));
+        tv_existencia.setText(consultasConteoClf.getExistencia(codigo,idalmacen,id_clf, contexto));
+        tv_conteo.setText(consultasConteoClf.getConteo(codigo,idalmacen,id_clf,contexto));
+        tv_diferencia.setText(consultasConteoClf.getDiferencia(codigo,idalmacen,id_clf,contexto));
     }
-    public void fab_guardar(View view) {
-        //complementos.mensajes("guardar",contexto);
-        //consultaSeries.insertarSerie("x","SERIE","1","N",contexto);
-        //actualizarLista();
-        //new consultaSeries().execute();
-        consultaSeries.eliminarSeriesPorArt(codigo,idalmacen,contexto);
-        actualizarLista();
-    }
+
     public void actualizarListaPorEstatus(String estatus)
     {
         complementos.mensajes(estatus,contexto);
@@ -376,7 +345,7 @@ public class SeriesActivity extends AppCompatActivity {
 
             if(estatus.equalsIgnoreCase("C"))
             {
-                Cursor fila = db.rawQuery("SELECT serie,estatus FROM series where almacen='"+idalmacen+"' and codigo='"+codigo+"'  ",null);
+                Cursor fila = db.rawQuery("SELECT serie,estatus FROM seriesclf where almacen='"+idalmacen+"' and codigo='"+codigo+"'  ",null);
                 if(fila.moveToFirst())
                 {
                     do {
@@ -392,7 +361,7 @@ public class SeriesActivity extends AppCompatActivity {
             else
             {
                 complementos.mensajes("xd",contexto);
-                Cursor fila = db.rawQuery("SELECT serie,estatus FROM series where almacen='"+idalmacen+"' and codigo='"+codigo+"' and estatus='"+estatus+"'  ",null);
+                Cursor fila = db.rawQuery("SELECT serie,estatus FROM seriesclf where almacen='"+idalmacen+"' and codigo='"+codigo+"' and estatus='"+estatus+"'  ",null);
                 if(fila.moveToFirst())
                 {
                     do {
@@ -422,7 +391,7 @@ public class SeriesActivity extends AppCompatActivity {
         try{
             Database admin = new Database(contexto,null,1);
             SQLiteDatabase db = admin.getWritableDatabase();
-            Cursor fila = db.rawQuery("SELECT serie,estatus FROM series where almacen='"+idalmacen+"' and codigo='"+codigo+"'  ",null);
+            Cursor fila = db.rawQuery("SELECT serie,estatus FROM seriesclf where almacen='"+idalmacen+"' and codigo='"+codigo+"'  ",null);
             if(fila.moveToFirst())
             {
                 do {
@@ -499,13 +468,13 @@ public class SeriesActivity extends AppCompatActivity {
                             //publishProgress(i+1);
                             JSONObject objeto = jArray.getJSONObject(i);
                             serie=objeto.getString("serie");
-                            consultaSeries.insertarSerie(serie,codigo,idalmacen,"N",contexto);
+                            consultaSeriesClf.insertarSerie(serie,codigo,idalmacen,"N",id_clf,contexto);
                             Log.i("respuesta"," | "+serie);
 
                         }
                         float conteo=0;
                         float dif=exis-conteo;
-                        consultasConteo.actualizarConteo(codigo,conteo,exis,idalmacen,dif,contexto);
+                        consultasConteoClf.actualizarConteo(codigo,conteo,idalmacen,dif,id_clf,contexto);
                         //consultasConteo.setExistencia(codigo,idalmacen,contexto,exis);
                         //Log.i("peticion"," | "+jObject.toString());
                         //Log.i("peticion"," | "+jArray.toString());
@@ -546,13 +515,14 @@ public class SeriesActivity extends AppCompatActivity {
             complementos.mensajes(mensaje,contexto);
             if(validar.equalsIgnoreCase("TRUE"))
             {
-                tv_existencia.setText(consultasConteo.getExistencia(codigo,idalmacen,contexto));
+                //tv_existencia.setText(consultasConteoClf.getExistencia(codigo,idalmacen,id_clf,contexto));
+
             }
             else
             {
                 //finish();
             }
-
+            actualizarHeader();
             actualizarLista();
             super.onPostExecute(s);
         }
@@ -606,9 +576,9 @@ public class SeriesActivity extends AppCompatActivity {
                             //publishProgress(i+1);
                             JSONObject objeto = jArray.getJSONObject(i);
                             serie=objeto.getString("serie");
-                            if(consultaSeries.buscarSerie(codigo,idalmacen,serie,contexto)==false)
+                            if(consultaSeriesClf.buscarSerie(codigo,idalmacen,serie,contexto)==false)
                             {
-                                consultaSeries.insertarSerie(serie,codigo,idalmacen,"N",contexto);
+                                consultaSeriesClf.insertarSerie(serie,codigo,idalmacen,"N",id_clf,contexto);
                             }
 
                             Log.i("respuesta"," | "+serie);
@@ -656,10 +626,10 @@ public class SeriesActivity extends AppCompatActivity {
             if(validar.equalsIgnoreCase("TRUE"))
             {
                 complementos.mensajes("true",contexto);
-                float contadas=consultaSeries.getSeriesContadas(codigo,idalmacen,contexto);
-                float exis=consultaSeries.getSeriesExistencia(codigo,idalmacen,contexto) ;
+                float contadas=consultaSeriesClf.getSeriesContadas(codigo,idalmacen,contexto);
+                float exis=consultaSeriesClf.getSeriesExistencia(codigo,idalmacen,contexto) ;
                 float dif=exis-contadas;
-                consultasConteo.actualizarConteo(codigo,contadas,exis,idalmacen,dif,contexto);
+                consultasConteoClf.actualizarConteo(codigo,contadas,idalmacen,dif,id_clf,contexto);
                 actualizarLista();
                 actualizarHeader();
                 //tv_existencia.setText(consultasConteo.getExistencia(codigo,idalmacen,contexto));

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <TextView
+            android:gravity="center"
+            android:textSize="30dp"
+            android:layout_gravity="center"
+            android:text="Visualizar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        </TextView>
+        <RadioGroup
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <RadioButton
+                android:id="@+id/rb_completo"
+                android:layout_marginLeft="40dp"
+                android:text="COMPLETO"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            </RadioButton>
+
+
+
+
+            <RadioButton
+                android:id="@+id/rb_diferencias"
+                android:layout_marginLeft="40dp"
+                android:text="DIFERENCIAS DEL CONTEO"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+            </RadioButton>
+            <RadioButton
+                android:id="@+id/rb_conteo"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="40dp"
+                android:text="CONTINUAR CONTANDO"
+                android:layout_width="match_parent"
+                android:visibility="gone"
+                android:layout_height="wrap_content">
+            </RadioButton>
+
+
+        </RadioGroup>
+    </LinearLayout>
+
+</android.support.constraint.ConstraintLayout>

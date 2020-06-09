@@ -1,7 +1,6 @@
 package com.invmobile.invmobile;
 
 import android.app.Activity;
-import android.content.Context;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,15 +9,16 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.invmobile.invmobile.Modelo.InventarioModel;
+import com.invmobile.invmobile.Modelo.InventarioModelClf;
 
 import java.util.ArrayList;
 
-public class AdaptadorConteo extends BaseAdapter {
-    private ArrayList<InventarioModel> datos;
+public class AdaptadorConteoClf extends BaseAdapter {
+    private ArrayList<InventarioModelClf> datos;
     LayoutInflater inflater;
     Activity activity;
 
-    public AdaptadorConteo(Activity activity, ArrayList<InventarioModel> datos) {
+    public AdaptadorConteoClf(Activity activity, ArrayList<InventarioModelClf> datos) {
         this.datos = datos;
         inflater = activity.getLayoutInflater();
         this.activity = activity;
@@ -55,7 +55,7 @@ public class AdaptadorConteo extends BaseAdapter {
         TextView tv_existencia=(TextView)view.findViewById(R.id.tv_existencia);
         TextView tv_conteo=(TextView)view.findViewById(R.id.tv_conteo);
         TextView tv_diferencia=(TextView)view.findViewById(R.id.tv_diferencia);
-        InventarioModel item=(InventarioModel) getItem(i);
+        InventarioModelClf item=(InventarioModelClf) getItem(i);
         tv_codigo.setText(item.getCodigoArticulo());
         tv_descripcion.setText(item.getDescripcion());
         tv_serie.setText(item.getSerie());
