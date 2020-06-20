@@ -23,7 +23,8 @@ public class Database extends SQLiteOpenHelper {
             "empresa text," +
             "dominio text," +
             "almacen text," +
-            "id_clf text)";
+            "id_clf text," +
+            "token text)";
     public static final String SQL_ALMACENES="CREATE TABLE "+TABLA_ALM+"(id_almacen text ," +
             "almacen text)";
     public static final String SQL_CONTEO="CREATE TABLE "+TABLA_CTO+"(_id INTEGER PRIMARY KEY," +

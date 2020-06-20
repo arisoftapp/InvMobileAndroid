@@ -10,37 +10,26 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <LinearLayout
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:background="@color/gris"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-            <TextView
-                android:layout_margin="@dimen/inv_margin"
-                android:textColor="@color/blanco"
-                android:text="Almacen:"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+
             <TextView
                 android:id="@+id/tv_alm"
                 android:text="alm"
-                android:layout_marginBottom="@dimen/inv_margin"
-                android:layout_marginTop="@dimen/inv_margin"
-                android:layout_marginRight="@dimen/inv_margin"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:layout_marginLeft="@dimen/inv_margin"
                 android:textColor="@color/blanco"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
-            <TextView
-                android:layout_margin="@dimen/inv_margin"
-                android:textColor="@color/blanco"
-                android:text="Familia:"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+
             <TextView
                 android:id="@+id/tv_clf"
                 android:text="clf"
-                android:layout_marginBottom="@dimen/inv_margin"
-                android:layout_marginTop="@dimen/inv_margin"
-                android:layout_marginRight="@dimen/inv_margin"
+                android:layout_marginLeft="@dimen/inv_margin"
+                android:layout_marginBottom="5dp"
                 android:textColor="@color/blanco"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>

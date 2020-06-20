@@ -31,6 +31,7 @@ import com.invmobile.invmobile.Modelo.InventarioModel;
 import com.invmobile.invmobile.Modelo.InventarioModelClf;
 import com.invmobile.invmobile.tools.Complementos;
 import com.invmobile.invmobile.tools.ConsultaAlmacenes;
+import com.invmobile.invmobile.tools.ConsultaClasificaciones;
 import com.invmobile.invmobile.tools.ConsultasConteo;
 import com.invmobile.invmobile.tools.ConsultasConteoClf;
 import com.invmobile.invmobile.tools.ConsultasSinConteo;
@@ -42,8 +43,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.DataOutputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -55,6 +58,7 @@ public class InventarioClf extends AppCompatActivity {
     ConsultasUsuario consultasUsuario;
     ConsultaAlmacenes consultaAlmacenes;
     ConsultasConteoClf consultasConteoClf;
+    ConsultaClasificaciones consultaClasificaciones;
     Context contexto;
     String idalmacen,id_clf;
     EditText et_conteo,et_cant,et_conteo_edit;
@@ -90,11 +94,12 @@ public class InventarioClf extends AppCompatActivity {
         complementos=new Complementos();
         consultasUsuario=new ConsultasUsuario();
         consultasConteoClf=new ConsultasConteoClf();
+        consultaClasificaciones=new ConsultaClasificaciones();
         idalmacen=consultasUsuario.getAlmacenSeleccionado(contexto);
         id_clf=consultasUsuario.getClfSeleccionado(contexto);
         ll_busqueda=findViewById(R.id.ll_busqueda);
-        tv_clf.setText(id_clf);
-        tv_alm.setText(idalmacen+"-"+consultaAlmacenes.getAlmacen(contexto,idalmacen));
+        tv_clf.setText("Clasificacion: "+id_clf+"-"+consultaClasificaciones.getClasificacion(contexto,id_clf));
+        tv_alm.setText("Almacen: "+idalmacen+"-"+consultaAlmacenes.getAlmacen(contexto,idalmacen));
         ruta=complementos.getUrl()+consultasUsuario.getDominio(contexto)+"/";
         timeout=complementos.getTimeout();
         mp=MediaPlayer.create(this,R.raw.beepmicro);
@@ -509,291 +514,6 @@ public class InventarioClf extends AppCompatActivity {
             et_cant.setEnabled(false);
         }
     }
-/*
-    class consultaArticulo extends AsyncTask<String,Integer,String>
-    {
-        String validar;
-        String serie;
-        String codigo;
-        @Override
-        protected void onPreExecute()
-        {
-            complementos.inciar_barra_progreso_spinner(contexto,"Consultando Articulo");
-            super.onPreExecute();
-        }
-        @Override
-        protected String doInBackground(String... params)
-        {
-            try {
-                codigo=params[0];
-                String codigo2,descripcion;
-                Float conteo=Float.parseFloat(params[1]),existencia,diferencia;
-
-                URL url = new URL(ruta+"conteo/"+idalmacen+"/"+codigo); //in the real code, there is an ip and a port
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setRequestMethod("GET");
-                conn.setConnectTimeout(timeout);
-                conn.setReadTimeout(timeout);
-                conn.connect();
-                BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                StringBuilder sb = new StringBuilder();
-                String line;
-                while ((line = br.readLine()) != null) {
-                    sb.append(line+"\n");
-                }
-                int status=conn.getResponseCode();
-                if(status<400)
-                {
-                    validar="TRUE";
-                    String finalJSON = sb.toString();
-                    JSONObject jObject = new JSONObject(finalJSON); //Obtenemos el JSON global
-                    mensaje=jObject.getString("mensaje");
-                    if(jObject.getBoolean("success")==true)
-                    {
-                        JSONArray jArray = jObject.getJSONArray("datos");
-                        //complementos.setMax(jArray.length());
-                        for (int i=0;i<jArray.length();i++)
-                        {
-                            //publishProgress(i+1);
-                            JSONObject objeto = jArray.getJSONObject(i);
-                            codigo=objeto.getString("codigo");
-                            serie=objeto.getString("serie");
-                            existencia=Float.parseFloat(objeto.getString("existenciaActual"));
-                            diferencia=existencia-conteo;
-                            codigo2=objeto.getString("codigo2");
-                            descripcion=objeto.getString("descripcion");
-
-                            if(serie.equalsIgnoreCase("S"))
-                            {
-                                conteo=Float.valueOf(0);
-                                existencia=Float.valueOf(0);
-                                diferencia=Float.valueOf(0);
-                                consultasConteo.insertarConteo(codigo,codigo2,descripcion,conteo,existencia,idalmacen,serie,diferencia,contexto);
-
-
-                            }
-                            else
-                            {
-                                consultasConteo.insertarConteo(codigo,codigo2,descripcion,conteo,existencia,idalmacen,serie,diferencia,contexto);
-
-                            }
-                            if(consultasSinConteo.getTablaVacia(contexto)==false)
-                            {
-                                consultasSinConteo.eliminarCodigoSinConteo(codigo,idalmacen,contexto);
-                            }
-
-                        }
-                        Log.i("peticion"," | "+jObject.toString());
-                        Log.i("peticion"," | "+jArray.toString());
-                    }
-                    else
-                    {
-                        validar="FALSE";
-                    }
-                    br.close();
-
-                }
-                else
-                {
-                    validar="FALSE";
-                    mensaje=conn.getResponseMessage();
-                }
-
-                Log.i("peticion"," | "+status);
-                conn.disconnect();
-            }
-            catch (Exception e)
-            {
-                validar="FALSE";
-                mensaje=e.getMessage();
-            }
-            return validar;
-
-        }
-        protected void onProgressUpdate(Integer... i)
-        {
-            //progreso.setProgress(i[0]);
-            complementos.setProgreso(i[0]);
-        }
-        protected void onPostExecute(String s)
-        {
-
-            complementos.cerrar_barra_progreso();
-            complementos.mensajes(mensaje,contexto);
-            et_conteo.setText("");
-            actualizarLista();
-
-            if(s.equalsIgnoreCase("TRUE"))
-            {
-                mp.start();
-
-                if(serie.equalsIgnoreCase("S"))
-                {
-                    complementos.mensajes("Articulo con series",contexto);
-                    Intent i = new Intent(getApplicationContext(),SeriesActivity.class);
-                    i.putExtra("codigo",codigo);
-                    startActivity(i);
-                }
-                else
-                {
-
-                }
-            }
-            else
-            {
-                mpError.start();
-                complementos.mensajes("Consultar Articulo de nuevo",contexto);
-            }
-            if(cb_cant.isChecked())
-            {
-                et_cant.setText("1");
-                cb_cant.setChecked(false);
-                et_cant.setEnabled(false);
-            }
-
-            super.onPostExecute(s);
-        }
-    }
-
-    class actualizarArticulo extends AsyncTask<String,Integer,String>
-    {
-        String validar;
-        String serie;
-        String codigo;
-        @Override
-        protected void onPreExecute()
-        {
-            complementos.inciar_barra_progreso_spinner(contexto,"Consultando Articulo");
-            super.onPreExecute();
-        }
-        @Override
-        protected String doInBackground(String... params)
-        {
-            try {
-                codigo=params[0];
-                Float conteo=Float.parseFloat(params[1]),existencia,diferencia;
-                Log.i("pruebaactualizar"," | "+conteo+" | "+codigo);
-                URL url = new URL(ruta+"soloexistencia/"+idalmacen+"/"+codigo); //in the real code, there is an ip and a port
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setRequestMethod("GET");
-                conn.setConnectTimeout(timeout);
-                conn.setReadTimeout(timeout);
-                conn.connect();
-                BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-                StringBuilder sb = new StringBuilder();
-                String line;
-                while ((line = br.readLine()) != null) {
-                    sb.append(line+"\n");
-                }
-                int status=conn.getResponseCode();
-                if(status<400)
-                {
-                    validar="TRUE";
-                    String finalJSON = sb.toString();
-                    JSONObject jObject = new JSONObject(finalJSON); //Obtenemos el JSON global
-                    mensaje=jObject.getString("mensaje");
-                    if(jObject.getBoolean("success")==true)
-                    {
-                        JSONArray jArray = jObject.getJSONArray("datos");
-                        //complementos.setMax(jArray.length());
-                        for (int i=0;i<jArray.length();i++)
-                        {
-
-
-                            //publishProgress(i+1);
-                            JSONObject objeto = jArray.getJSONObject(i);
-                            serie=objeto.getString("serie");
-                            //codigo=objeto.getString("codigo");
-                            Log.i("pruebaactualizar"," | "+codigo+" | "+serie+" | "+objeto.getString("existenciaActual"));
-                            existencia=Float.parseFloat(objeto.getString("existenciaActual"));
-
-                            Log.i("pruebaactualizar"," | "+codigo+" | "+serie);
-                            if(serie.equalsIgnoreCase("S"))
-                            {
-                                //consultasConteo.insertarConteo(codigo,codigo2,descripcion,conteo,existencia,idalmacen,serie,diferencia,contexto);
-                            }
-                            else
-                            {
-                                conteo=conteo+Float.valueOf(consultasConteo.getConteo(codigo,idalmacen,contexto)) ;
-                                diferencia=existencia-conteo;
-                                //Log.i("pruebaactualizar"," | "+codigo);
-                                consultasConteo.actualizarConteo(codigo,conteo,existencia,idalmacen,diferencia,contexto);
-                                //consultasConteo.insertarConteo(codigo,codigo2,descripcion,conteo,existencia,idalmacen,serie,diferencia,contexto);
-                            }
-
-                        }
-                        Log.i("peticion"," | "+jObject.toString());
-                        Log.i("peticion"," | "+jArray.toString());
-                    }
-                    else
-                    {
-                        validar="FALSE";
-                    }
-                    br.close();
-
-                }
-                else
-                {
-                    validar="FALSE";
-                    mensaje=conn.getResponseMessage();
-                }
-
-                Log.i("peticion"," | "+status);
-                conn.disconnect();
-            }
-            catch (Exception e)
-            {
-                validar="FALSE";
-                mensaje=e.getMessage();
-            }
-            return validar;
-
-        }
-        protected void onProgressUpdate(Integer... i)
-        {
-            //progreso.setProgress(i[0]);
-            complementos.setProgreso(i[0]);
-        }
-        protected void onPostExecute(String s)
-        {
-
-            complementos.cerrar_barra_progreso();
-            complementos.mensajes(mensaje,contexto);
-            et_conteo.setText("");
-            actualizarLista();
-
-            if(s.equalsIgnoreCase("TRUE"))
-            {
-                mp.start();
-                if(serie.equalsIgnoreCase("S"))
-                {
-                    complementos.mensajes("Articulo con series",contexto);
-                    Intent i = new Intent(getApplicationContext(),SeriesActivity.class);
-                    i.putExtra("codigo",codigo);
-                    startActivity(i);
-                }
-                else
-                {
-
-                }
-            }
-            else
-            {
-                mpError.start();
-                complementos.mensajes("Consultar Articulo de nuevo",contexto);
-            }
-            if(cb_cant.isChecked())
-            {
-                et_cant.setText("1");
-                cb_cant.setChecked(false);
-                et_cant.setEnabled(false);
-            }
-
-            super.onPostExecute(s);
-        }
-    }
-
- */
 
     class actualizarSoloExistencia extends AsyncTask<String,Integer,String>
     {
@@ -1016,6 +736,19 @@ public class InventarioClf extends AppCompatActivity {
                 conn.setConnectTimeout(timeout);
                 conn.setReadTimeout(timeout);
                 conn.connect();
+                /*
+                JSONObject jsonClf = new JSONObject();
+                jsonClf.put("clf", id_clf);
+                conn.setRequestProperty("Content-Type","application/json");
+                conn.setDoOutput(true);
+                conn.setDoInput(true);
+                conn.connect();
+                BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(conn.getOutputStream(), "UTF-8"));
+                bw.write(jsonClf.toString());
+                bw.flush();
+                bw.close();
+*/
+
                 BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                 StringBuilder sb = new StringBuilder();
                 String line;
@@ -1143,7 +876,7 @@ public class InventarioClf extends AppCompatActivity {
         final JSONObject jsonParams = new JSONObject();
         try {
             jsonParams.put("alm", idalmacen);
-            jsonParams.put("nombre_alm", consultaAlmacenes.getAlmacen(contexto,idalmacen));
+            jsonParams.put("nombre_alm",idalmacen+" - "+ consultaAlmacenes.getAlmacen(contexto,idalmacen));
             jsonParams.put("params", conteo);
             jsonParams.put("series", series);
             jsonParams.put("id_clf", id_clf);
@@ -1174,20 +907,21 @@ public class InventarioClf extends AppCompatActivity {
         protected String doInBackground(String... params)
         {
             try{
-                URL url = new URL(ruta+"conteo"); //in the real code, there is an ip and a port
+                URL url = new URL("http://wsar.homelinux.com:3000/conteo"); //in the real code, there is an ip and a port
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
                 conn.setRequestProperty("Content-Type", "application/json");
                 conn.setRequestProperty("Accept","application/json");
+                conn.setRequestProperty("x-access-token",consultasUsuario.getToken(contexto));
                 conn.setConnectTimeout(timeout);
                 conn.setReadTimeout(timeout);
                 conn.setDoOutput(true);
                 conn.setDoInput(true);
                 conn.connect();
-                DataOutputStream os = new DataOutputStream(conn.getOutputStream());
-                os.writeBytes(crearJson2().toString());
-                os.flush();
-                os.close();
+                BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(conn.getOutputStream(), "UTF-8"));
+                bw.write(crearJson2().toString());
+                bw.flush();
+                bw.close();
                 BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                 StringBuilder sb = new StringBuilder();
                 String line;
@@ -1199,7 +933,7 @@ public class InventarioClf extends AppCompatActivity {
                 int status = conn.getResponseCode();
                 JSONObject jObject = new JSONObject(finalJSON); //Obtenemos el JSON global
                 mensaje=jObject.getString("message");
-                Log.i("CONTEOGUARDADO"," " +mensaje);
+
                 if(status<400)
                 {
                     validar="TRUE";
@@ -1208,8 +942,9 @@ public class InventarioClf extends AppCompatActivity {
                     //mensaje=jObject.getString("message");
                     if(jObject.getBoolean("success")==true)
                     {
-                        idConteo=jObject.getString("idConteo");
-                        Log.i("CONTEOGUARDADO"," " + jObject.getString("idConteo")+" "+jObject.getString("idAlm"));
+                        idConteo=jObject.getString("id_conteo");
+                        Log.i("CONTEOGUARDADO"," " +mensaje+" "+idConteo);
+                        //Log.i("CONTEOGUARDADO"," " + jObject.getString("idConteo")+" "+jObject.getString("idAlm"));
                     }
                     else
                     {

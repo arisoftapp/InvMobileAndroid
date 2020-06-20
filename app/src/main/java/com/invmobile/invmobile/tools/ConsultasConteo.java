@@ -21,8 +21,6 @@ public class ConsultasConteo {
     ArrayAdapter<String> adapter;
     ArrayList<InventarioModel>datos ;
 
-
-
     public Boolean getTablaVacia(Context contexto) {
         Boolean vacio = true;
         Database admin = new Database(contexto, null,1);
@@ -37,6 +35,23 @@ public class ConsultasConteo {
             vacio = true;
         }
         db.close();
+        return vacio;
+    }
+    public Boolean getTablaVaciaAlm(String id_alm,Context contexto) {
+        Boolean vacio = true;
+        Database admin = new Database(contexto, null,1);
+        SQLiteDatabase db = admin.getWritableDatabase();
+        try {
+            Cursor fila = db.rawQuery("SELECT * FROM conteo where idalmacen='"+id_alm+"' ",null);
+            if(fila.moveToFirst()) {
+                vacio=false;
+            }
+
+        }catch (SQLiteException sql){
+            vacio = true;
+        }
+        db.close();
+        Log.i("tablavaciaalmacen",""+vacio);
         return vacio;
     }
     public Boolean buscarArticulo(String codigo,String idalmacen, Context contexto) {

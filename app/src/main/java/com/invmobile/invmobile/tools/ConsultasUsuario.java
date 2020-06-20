@@ -162,4 +162,30 @@ public class ConsultasUsuario {
 
         return resultado;
     }
+    public String getToken(Context contexto)
+    {
+        String resultado="";
+        try{
+            Database admin = new Database(contexto,null,1);
+            SQLiteDatabase db = admin.getWritableDatabase();
+            Cursor fila = db.rawQuery("SELECT token FROM login",null);
+            if(fila.moveToFirst())
+            {
+                Log.i("consultausuario"," | "+fila.getString(0));
+                resultado=fila.getString(0);
+            }
+            else
+            {
+                resultado="";
+            }
+            db.close();
+        }catch (Exception e)
+        {
+            Log.e("Error:",""+e.getMessage());
+            resultado="";
+            //mensajes("Error al validar login:"+e.getMessage());
+        }
+
+        return resultado;
+    }
 }

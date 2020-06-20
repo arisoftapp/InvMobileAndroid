@@ -44,8 +44,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.DataOutputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -65,7 +67,7 @@ public class Inventario extends AppCompatActivity {
     int timeout,opc;
     ListView lista_conteo;
     AdaptadorConteo adaptadorConteo;
-    CheckBox cb_cant;
+    CheckBox cb_cant,cb_busqueda;
     ArrayList<InventarioModel>lista;
     AlertDialog dialog;
     View vista;
@@ -87,6 +89,7 @@ public class Inventario extends AppCompatActivity {
         lista_conteo=(ListView)findViewById(R.id.lista_conteo);
         et_cant=(EditText)findViewById(R.id.et_cant);
         cb_cant=(CheckBox)findViewById(R.id.cb_cant);
+        cb_busqueda = (CheckBox) findViewById(R.id.cb_buscar);
         consultaAlmacenes=new ConsultaAlmacenes();
         complementos=new Complementos();
         consultasUsuario=new ConsultasUsuario();
@@ -283,9 +286,9 @@ public class Inventario extends AppCompatActivity {
                 else
                 {
 
-                    if(consultasConteo.getTablaVacia(contexto)==true)
+                    if(consultasConteo.getTablaVaciaAlm(idalmacen,contexto)==true)
                     {
-                        //complementos.mensajes("Tabla vacia",contexto);
+                        complementos.mensajes("Tabla vacia",contexto);
                         //insertar
                         new consultaArticulo().execute(codigo.getText().toString().trim(),cantConteo);
 
@@ -301,12 +304,13 @@ public class Inventario extends AppCompatActivity {
                             if(consultasConteo.codigo2(codigo.getText().toString().trim(),idalmacen,contexto))
                             {
                                 //si es codigo2
+                                complementos.mensajes("codigo 2 ",contexto);
                                 new actualizarArticulo().execute(consultasConteo.getCodigo1(codigo.getText().toString().trim(),idalmacen,contexto),cantConteo);
                             }
                             else
                             {
 
-
+                                complementos.mensajes("codigo 1",contexto);
                                 new actualizarArticulo().execute(codigo.getText().toString().trim(),cantConteo);
                             }
 
@@ -412,7 +416,7 @@ public class Inventario extends AppCompatActivity {
             }
             else
             {
-                complementos.mensajes("guardar",contexto);
+                //complementos.mensajes("guardar",contexto);
                 //crearJson();
                 //crearJson2();
                 new guardarConteo().execute();
@@ -1107,7 +1111,7 @@ public class Inventario extends AppCompatActivity {
     class guardarConteo extends AsyncTask<String,Integer,String>
     {
         String validar;
-        String idConteo;
+        String idConteo="";
         @Override
         protected void onPreExecute()
         {
@@ -1117,7 +1121,7 @@ public class Inventario extends AppCompatActivity {
         @Override
         protected String doInBackground(String... params)
         {
-            Log.i("CONTEOGUARDADO"," " +crearJson());
+            //Log.i("CONTEOGUARDADO"," " +crearJson());
             try{
                 URL url = new URL(ruta+"conteo"); //in the real code, there is an ip and a port
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -1129,10 +1133,11 @@ public class Inventario extends AppCompatActivity {
                 conn.setDoOutput(true);
                 conn.setDoInput(true);
                 conn.connect();
-                DataOutputStream os = new DataOutputStream(conn.getOutputStream());
-                os.writeBytes(crearJson2().toString());
-                os.flush();
-                os.close();
+                BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(conn.getOutputStream(), "UTF-8"));
+                bw.write(crearJson2().toString());
+                bw.flush();
+                bw.close();
+
                 BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                 StringBuilder sb = new StringBuilder();
                 String line;
@@ -1144,7 +1149,7 @@ public class Inventario extends AppCompatActivity {
                 int status = conn.getResponseCode();
                 JSONObject jObject = new JSONObject(finalJSON); //Obtenemos el JSON global
                 mensaje=jObject.getString("message");
-                Log.i("CONTEOGUARDADO"," " +mensaje);
+                //Log.i("CONTEOGUARDADO"," " +mensaje+"   todo "+jObject.toString());
                 if(status<400)
                 {
                     validar="TRUE";
@@ -1153,8 +1158,8 @@ public class Inventario extends AppCompatActivity {
                     //mensaje=jObject.getString("message");
                     if(jObject.getBoolean("success")==true)
                     {
-                        idConteo=jObject.getString("idConteo");
-                        Log.i("CONTEOGUARDADO"," " + jObject.getString("idConteo")+" "+jObject.getString("idAlm"));
+                        idConteo=jObject.getString("conteo_id");
+                        Log.i("CONTEOGUARDADO"," " + jObject.getString("conteo_id")+" "+jObject.getString("almacen_id"));
                     }
                     else
                     {
@@ -1188,7 +1193,7 @@ public class Inventario extends AppCompatActivity {
             complementos.mensajes(""+mensaje,contexto);
             if(s.equalsIgnoreCase("TRUE"))
             {
-                complementos.mensajes("se genero conteo con id:"+idConteo+" ",contexto);
+                complementos.mensajes("ID CONTEO:"+idConteo+" ",contexto);
                 //Intent i=new Intent(getApplicationContext(),MainActivity.class);
                 //startActivity(i);
                 //finish();

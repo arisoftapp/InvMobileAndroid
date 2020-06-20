@@ -162,6 +162,8 @@ public class Login extends AppCompatActivity {
                     String finalJSON = sb.toString();
                     JSONObject jObject = new JSONObject(finalJSON); //Obtenemos el JSON global
                     mensaje=jObject.getString("mensaje");
+                    String token=jObject.getString("token");
+
                     if(jObject.getBoolean("success")==true)
                     {
                         JSONArray jArray = jObject.getJSONArray("usuario");
@@ -179,6 +181,7 @@ public class Login extends AppCompatActivity {
                                 r.put("empresa", objeto.getString("empresa"));
                                 r.put("dominio",objeto.getString("dominio"));
                                 r.put("almacen","");
+                                r.put("token",token);
                                 //r.put("dominio", "3011");
                                 db.insert("login", null, r);
                                 db.close();

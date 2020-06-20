@@ -52,6 +52,22 @@ public class ConsultasSinConteo {
         db.close();
         return vacio;
     }
+    public Boolean getTablaVaciaAlm(String id_alm, Context contexto) {
+        Boolean vacio = true;
+        Database admin = new Database(contexto, null,1);
+        SQLiteDatabase db = admin.getWritableDatabase();
+        try {
+            Cursor fila = db.rawQuery("SELECT * FROM sinconteo where idalmacen='"+id_alm+"' ",null);
+            if(fila.moveToFirst()) {
+                vacio=false;
+            }
+
+        }catch (SQLiteException sql){
+            vacio = true;
+        }
+        db.close();
+        return vacio;
+    }
     public void eliminarCodigoSinConteo(String codigo,String idalmacen, Context contexto)
     {
         boolean validar;
